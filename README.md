@@ -1,15 +1,6 @@
 # ptt-web-crawler (PTT 網路版爬蟲) [![Build Status](https://travis-ci.org/jwlin/ptt-web-crawler.svg?branch=master)](https://travis-ci.org/jwlin/ptt-web-crawler)
 
-### [English Readme](#english_desc)
-### [Live demo](http://app.castman.net/ptt-web-crawler)
-### [Scrapy 版本](https://github.com/afunTW/ptt-web-crawler) by afunTW
-
-特色
-
-* 支援單篇及多篇文章抓取
-* 過濾資料內空白、空行及特殊字元
-* JSON 格式輸出
-* 支援 Python 2.7, 3.4-3.6
+Forked form jwlin/ptt-web-crawler
 
 輸出 JSON 格式
 ```
