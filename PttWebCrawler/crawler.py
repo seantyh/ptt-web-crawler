@@ -4,18 +4,21 @@ import sys
 import json
 import requests
 import time
+from pathlib import Path
 from bs4 import BeautifulSoup
 import logging
 
 logger = logging.getLogger("PttWebCrawler.PttWebCrawler")
 logger.setLevel("INFO")
-
+SLEEP_TIME = 0.5
 class PttWebCrawler:
 
     PTT_URL = 'https://www.ptt.cc'
 
-    def __init__(self):
-        pass
+    def __init__(self, data_path):
+        self.data_path = Path(data_path)
+        if not self.data_path.exists():
+            self.data_path.mkdir(parents=True)        
 
     def parse_articles(self, start, end, board, path='.', timeout=3):
         filename = board + '-' + str(start) + '-' + str(end) + '.json'
@@ -36,13 +39,16 @@ class PttWebCrawler:
             for div in divs:
                 try:
                     # ex. link would be <a href="/bbs/PublicServan/M.1127742013.A.240.html">Re: [問題] 職等</a>
-                    href = div.find('a')['href']
+                    if div.find('a'):
+                        href = div.find('a')['href']
+                    else:
+                        continue
                     link = self.PTT_URL + href
                     article_id = re.sub('\.html', '', href.split('/')[-1])
-                    article_list.append(self.parse(link, article_id, board))                        
+                    article_list.append(self.parse(link, article_id, board))
+                    time.sleep(SLEEP_TIME)
                 except Exception as ex:
-                    logger.error(ex)                    
-            time.sleep(0.1)
+                    logger.error(ex)                                
 
         self.store(filename, article_list, "w") 
         return filename
@@ -151,7 +157,8 @@ class PttWebCrawler:
             return 1
         return int(first_page.group(1)) + 1
 
-    def store(self, filename, data, mode):
-        with open(filename, mode, encoding='utf-8') as f:
-            f.write(data)
+    def store(self, filename, data, mode):        
+        with open(self.data_path.joinpath(filename), 
+                    mode, encoding='utf-8') as f:    
+            json.dump(data, f, ensure_ascii=False, indent=2)
 
