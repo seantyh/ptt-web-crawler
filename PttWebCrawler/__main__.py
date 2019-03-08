@@ -1,16 +1,43 @@
 import sys
-from PttWebCrawler.crawler import *
+import argparse
+from PttWebCrawler.crawler import PttWebCrawler
 
 
-def main(args=None):
+__version__ = '1.0-0.1'
+
+def main():
     """The main routine."""
-    if args is None:
-        args = sys.argv[1:]
+    parser = argparse.ArgumentParser(
+        formatter_class=argparse.RawDescriptionHelpFormatter, 
+        description=(
+        "A crawler for the web version of PTT, the largest online community in Taiwan."
+        "Input: board name and page indices (or articla ID)"
+        "Output: BOARD_NAME-START_INDEX-END_INDEX.json (or BOARD_NAME-ID.json)"
+        ))
+    parser.add_argument('-b', metavar='BOARD_NAME', help='Board name', required=True)
+    group = parser.add_mutually_exclusive_group(required=True)
+    group.add_argument('-i', metavar=('START_INDEX', 'END_INDEX'), type=int, nargs=2, help="Start and end index")    
+    group.add_argument('-u', metavar='URL', help='article id')
+    parser.add_argument('-v', '--version', action='version', version='%(prog)s ' + __version__)
 
-    PttWebCrawler(args)
-
-    # Do argument parsing here (eg. with argparse) and anything else
-    # you want your project to do.
+    args = parser.parse_args()
+    
+    ptt = PttWebCrawler()
+    if args.b:
+        board = args.b
+        
+    if args.i:
+        start = args.i[0]
+        if args.i[1] == -1:
+            end = self.getLastPage(board)
+        else:
+            end = args.i[1]
+        
+        ptt.parse_articles(start, end, board)
+    
+    if args.a:
+        article_id = args.a
+        ptt.parse_article(article_id, board)
 
 if __name__ == "__main__":
     main()
